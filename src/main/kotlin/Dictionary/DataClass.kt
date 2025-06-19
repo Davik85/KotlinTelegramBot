@@ -4,8 +4,8 @@ package org.example.Dictionary
 import java.io.File
 
 data class Word(
-    val english: String,
-    val russian: String,
+    val original: String,
+    val translate: String,
     var correctAnswersCount: Int = 0
 )
 
@@ -19,16 +19,16 @@ fun main() {
     for (line in lines) {
         val parts = line.split("|")
 
-        val english = parts.getOrNull(0)?.trim() ?: continue
-        val russian = parts.getOrNull(1)?.trim() ?: ""
+        val original = parts.getOrNull(0)?.trim() ?: continue
+        val translate = parts.getOrNull(1)?.trim() ?: ""
         val correctAnswers = parts.getOrNull(2)?.toIntOrNull() ?: 0
 
-        val word = Word(english, russian, correctAnswers)
+        val word = Word(original, translate, correctAnswers)
         dictionary.add(word)
     }
 
     println("Словарь:")
     for (word in dictionary) {
-        println("${word.english} — ${word.russian}, правильных ответов: ${word.correctAnswersCount}")
+        println("${word.original} — ${word.translate}, правильных ответов: ${word.correctAnswersCount}")
     }
 }
