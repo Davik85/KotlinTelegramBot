@@ -61,7 +61,53 @@ fun main() {
         val input = readLine()?.trim()
 
         when (input) {
-            "1" -> println("Вы выбрали: Учить слова")
+            "1" -> {
+                while (true) {
+                    val notLearnedList = dictionary.filter { it.correctAnswersCount < LEARNED_THRESHOLD }
+
+                    if (notLearnedList.isEmpty()) {
+                        println("Все слова в словаре выучены")
+                        break
+                    }
+
+                    val questionWords = notLearnedList.shuffled().take(4)
+
+                    val correctWord = questionWords.random()
+
+                    val variants = questionWords
+                        .map { it.translate }
+                        .shuffled()
+
+                    println()
+
+                    println("${correctWord.original}:")
+
+                    for ((index, variant) in variants.withIndex()) {
+                        println(" ${index + 1} - $variant")
+                    }
+
+                    print("Ваш ответ (номер) или 0 для выхода в меню: ")
+                    val answer = readLine()?.trim()
+
+                    if (answer == "0") break
+
+                    val answerIndex = answer?.toIntOrNull()
+                    if (answerIndex == null || answerIndex !in 1..variants.size) {
+                        println("Введите номер варианта ответа от 1 до ${variants.size}")
+                        continue
+                    }
+
+                    val chosen = variants[answerIndex - 1]
+                    if (chosen == correctWord.translate) {
+                        println("Правильно!")
+                        correctWord.correctAnswersCount++
+                    } else {
+                        println("Неправильно — правильный ответ: ${correctWord.translate}")
+                    }
+
+                }
+            }
+
             "2" -> {
                 val totalCount = dictionary.size
                 val learnedCount = dictionary.filter { it.correctAnswersCount >= LEARNED_THRESHOLD }.size
