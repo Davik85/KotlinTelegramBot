@@ -68,7 +68,7 @@ fun main() {
                     val mainPart = notLearnedList.shuffled().take(ANSWER_OPTIONS_COUNT)
                     val additionalCount = (ANSWER_OPTIONS_COUNT - mainPart.size).coerceAtLeast(0)
                     val additional = dictionary
-                        .filter { it.correctAnswersCount >= LEARNED_THRESHOLD && it !in mainPart }
+                        .filter { it.correctAnswersCount >= LEARNED_THRESHOLD }
                         .shuffled()
                         .take(additionalCount)
 
