@@ -2,6 +2,8 @@ package org.example.WordsFile
 
 import java.io.File
 
+const val LEARNED_THRESHOLD = 3
+
 data class Word(
     val original: String,
     val translate: String,
@@ -62,7 +64,7 @@ fun main() {
             "1" -> println("Вы выбрали: Учить слова")
             "2" -> {
                 val totalCount = dictionary.size
-                val learnedCount = dictionary.filter { it.correctAnswersCount >= 3 }.size
+                val learnedCount = dictionary.filter { it.correctAnswersCount >= LEARNED_THRESHOLD }.size
                 val percent = if (totalCount == 0) 0 else (learnedCount * 100 / totalCount)
 
                 println("Выучено $learnedCount из $totalCount слов | $percent%")
