@@ -1,16 +1,12 @@
 package org.example.WordsFile
 
-import Trainer.DictionaryRepository
-import Trainer.TrainerQuiz
-import Trainer.TrainerStats
-import Trainer.initializeDemoWordsIfNeeded
+import Trainer.LearnWordsTrainer
 
 fun main() {
-    initializeDemoWordsIfNeeded()
-    val dictionary = DictionaryRepository.load()
+    LearnWordsTrainer.initializeDemoWordsIfNeeded()
+    val trainer = LearnWordsTrainer()
 
-    println("Словарь:")
-    dictionary.forEach { println("${it.original} — ${it.translate}, правильных ответов: ${it.correctAnswersCount}") }
+    trainer.printDictionary()
 
     while (true) {
         println(
@@ -23,8 +19,8 @@ fun main() {
         )
         print("Введите пункт меню: ")
         when (readLine()?.trim()) {
-            "1" -> TrainerQuiz.start(dictionary)
-            "2" -> TrainerStats.print(dictionary)
+            "1" -> trainer.studyLoop()
+            "2" -> trainer.printStats()
             "0" -> {
                 println("Выход из программы...")
                 break
@@ -34,6 +30,7 @@ fun main() {
         println()
     }
 }
+
 
 
 

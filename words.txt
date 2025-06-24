@@ -1,7 +1,7 @@
 hello|привет|0
 dog|собака|1
 cat|кошка|0
-table|стол|0
+table|стол|1
 chair|стул|0
 house|дом|0
 bye|пока|0
