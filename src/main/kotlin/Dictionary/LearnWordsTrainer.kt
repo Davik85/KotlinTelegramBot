@@ -2,9 +2,9 @@ package Trainer
 
 import java.io.File
 
-const val LEARNED_THRESHOLD = 3
-const val ANSWER_OPTIONS_COUNT = 4
-const val WORDS_FILE = "words.txt"
+const val DEFAULT_LEARNED_THRESHOLD = 3
+const val DEFAULT_ANSWER_OPTIONS_COUNT = 4
+const val DEFAULT_WORDS_FILE = "words.txt"
 
 data class Word(
     val original: String,
@@ -12,90 +12,61 @@ data class Word(
     var correctAnswersCount: Int = 0
 )
 
+data class Question(
+    val options: List<Word>,
+    val correctIndex: Int
+)
+
 class LearnWordsTrainer(
-    private val fileName: String = WORDS_FILE
+    val learnedThreshold: Int = DEFAULT_LEARNED_THRESHOLD,
+    val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
+    private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private val dictionary: MutableList<Word> = loadDictionary()
-    private var currentQuestionWords: List<Word> = emptyList()
-    private var currentCorrectWord: Word? = null
+    private val dictionary: MutableList<Word> = loadDictionary().toMutableList()
 
-    fun printDictionary() {
-        println("Словарь:")
-        dictionary.forEach { println("${it.original} — ${it.translate}, правильных ответов: ${it.correctAnswersCount}") }
+    fun getStats(): Triple<Int, Int, Int> {
+        val total = dictionary.size
+        val learned = dictionary.count { it.correctAnswersCount >= learnedThreshold }
+        val percent = if (total == 0) 0 else (learned * 100 / total)
+        return Triple(total, learned, percent)
     }
 
-    fun printStats() {
-        val totalCount = dictionary.size
-        val learnedCount = dictionary.count { it.correctAnswersCount >= LEARNED_THRESHOLD }
-        val percent = if (totalCount == 0) 0 else (learnedCount * 100 / totalCount)
-        println("Выучено $learnedCount из $totalCount слов | $percent%")
-    }
-
-    fun studyLoop() {
-        while (true) {
-            val notLearnedList = dictionary.filter { it.correctAnswersCount < LEARNED_THRESHOLD }
-            if (notLearnedList.isEmpty()) {
-                println("Все слова в словаре выучены")
-                return
-            }
-            prepareQuestion(notLearnedList)
-            printQuestion()
-            val userAnswerInput = readLine()?.trim()
-
-            when {
-                userAnswerInput == "0" -> return
-                userAnswerInput?.toIntOrNull() !in 1..currentQuestionWords.size -> {
-                    println("Введите номер варианта ответа от 1 до ${currentQuestionWords.size}, или 0 для возврата в меню.")
-                }
-                else -> {
-                    checkAnswer(userAnswerInput!!.toInt())
-                }
-            }
-        }
-    }
-
-    private fun prepareQuestion(notLearnedList: List<Word>) {
-        val mainPart = notLearnedList.shuffled().take(ANSWER_OPTIONS_COUNT)
-        val additionalCount = (ANSWER_OPTIONS_COUNT - mainPart.size).coerceAtLeast(0)
+    fun nextQuestion(): Question? {
+        val notLearnedList = dictionary.filter { it.correctAnswersCount < learnedThreshold }
+        if (notLearnedList.isEmpty()) return null
+        val mainPart = notLearnedList.shuffled().take(answerOptionsCount)
+        val additionalCount = (answerOptionsCount - mainPart.size).coerceAtLeast(0)
         val additional = dictionary
-            .filter { it.correctAnswersCount >= LEARNED_THRESHOLD }
+            .filter { it.correctAnswersCount >= learnedThreshold }
             .shuffled()
             .take(additionalCount)
-        currentQuestionWords = (mainPart + additional).distinct().shuffled().take(ANSWER_OPTIONS_COUNT)
-        currentCorrectWord = currentQuestionWords.random()
+        val options = (mainPart + additional).distinct().shuffled().take(answerOptionsCount)
+        val correctWord = options.random()
+        val correctIndex = options.indexOf(correctWord)
+        return Question(options, correctIndex)
     }
 
-    private fun printQuestion() {
-        println("\n${currentCorrectWord?.original}:")
-        val variants = currentQuestionWords.map { it.translate }.shuffled()
-        currentQuestionWords = currentQuestionWords.sortedBy { variants.indexOf(it.translate) } // sync with printed variants
-        variants.forEachIndexed { i, variant -> println(" ${i + 1} - $variant") }
-        println("----------")
-        println(" 0 - Меню")
-        print("Ваш ответ (номер): ")
+    fun checkAnswer(question: Question, userAnswer: Int): Boolean {
+        return userAnswer == (question.correctIndex + 1)
     }
 
-    private fun checkAnswer(answer: Int) {
-        val correctAnswerId = currentQuestionWords.indexOf(currentCorrectWord) + 1
-        if (answer == correctAnswerId) {
-            println("Правильно!")
-            currentCorrectWord?.correctAnswersCount = (currentCorrectWord?.correctAnswersCount ?: 0) + 1
-            saveDictionary()
-        } else {
-            println("Неправильно! ${currentCorrectWord?.original} – это ${currentCorrectWord?.translate}")
-        }
+    fun incrementCorrect(question: Question) {
+        question.options[question.correctIndex].correctAnswersCount++
+        saveDictionary()
     }
 
-    private fun loadDictionary(): MutableList<Word> {
+    fun getDictionary(): List<Word> = dictionary
+
+    private fun loadDictionary(): List<Word> {
         val file = File(fileName)
-        if (!file.exists()) return mutableListOf()
+        if (!file.exists()) return emptyList()
         return file.readLines().mapNotNull { line ->
             val parts = line.split("|")
             val original = parts.getOrNull(0)?.trim() ?: return@mapNotNull null
             val translate = parts.getOrNull(1)?.trim() ?: ""
             val correctAnswers = parts.getOrNull(2)?.toIntOrNull() ?: 0
             Word(original, translate, correctAnswers)
-        }.toMutableList()
+        }
     }
 
     private fun saveDictionary() {
@@ -108,7 +79,7 @@ class LearnWordsTrainer(
 
     companion object {
         fun initializeDemoWordsIfNeeded() {
-            val wordsFile = File(WORDS_FILE)
+            val wordsFile = File("words.txt")
             if (!wordsFile.exists() || wordsFile.readText().isBlank()) {
                 wordsFile.writeText(
                     """
