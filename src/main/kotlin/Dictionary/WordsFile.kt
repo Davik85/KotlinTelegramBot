@@ -29,6 +29,17 @@ fun loadDictionary(): MutableList<Word> {
     return dictionary
 }
 
+fun saveDictionary(dictionary: List<Word>, fileName: String = "words.txt") {
+    val file = File(fileName)
+    file.bufferedWriter().use { writer ->
+        for (word in dictionary) {
+            writer.write("${word.original}|${word.translate}|${word.correctAnswersCount}")
+            writer.newLine()
+        }
+    }
+}
+
+
 fun main() {
     val wordsFile = File("words.txt")
     if (!wordsFile.exists() || wordsFile.readText().isBlank()) {
@@ -80,27 +91,31 @@ fun main() {
                     val correctWord = questionWords.random()
                     val variants = questionWords.map { it.translate }.shuffled()
 
+                    val correctAnswerId = variants.indexOf(correctWord.translate) + 1 // +1 потому что вывод от 1
+
                     println("\n${correctWord.original}:")
                     for ((index, variant) in variants.withIndex()) {
                         println(" ${index + 1} - $variant")
                     }
+                    println("----------")
+                    println(" 0 - Меню")
 
-                    print("Ваш ответ (номер) или 0 для выхода в меню: ")
-                    val answer = readLine()?.trim()
-                    if (answer == "0") break
+                    print("Ваш ответ (номер): ")
+                    val userAnswerInput = readLine()?.trim()
+                    if (userAnswerInput == "0") break
 
-                    val answerIndex = answer?.toIntOrNull()
-                    if (answerIndex == null || answerIndex !in 1..variants.size) {
-                        println("Введите номер варианта ответа от 1 до ${variants.size}")
+                    val userAnswer = userAnswerInput?.toIntOrNull()
+                    if (userAnswer == null || userAnswer !in 1..variants.size) {
+                        println("Введите номер варианта ответа от 1 до ${variants.size}, или 0 для возврата в меню.")
                         continue
                     }
 
-                    val chosen = variants[answerIndex - 1]
-                    if (chosen == correctWord.translate) {
+                    if (userAnswer == correctAnswerId) {
                         println("Правильно!")
                         correctWord.correctAnswersCount++
+                        saveDictionary(dictionary)
                     } else {
-                        println("Неправильно — правильный ответ: ${correctWord.translate}")
+                        println("Неправильно! ${correctWord.original} – это ${correctWord.translate}")
                     }
                 }
             }
