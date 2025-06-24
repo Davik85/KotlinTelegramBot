@@ -31,10 +31,14 @@ fun loadDictionary(): MutableList<Word> {
 
 fun saveDictionary(dictionary: List<Word>, fileName: String = "words.txt") {
     val file = File(fileName)
-    file.writeText(
-        dictionary.joinToString("\n") { "${it.original}|${it.translate}|${it.correctAnswersCount}" }
-    )
+    file.bufferedWriter().use { writer ->
+        for (word in dictionary) {
+            writer.write("${word.original}|${word.translate}|${word.correctAnswersCount}")
+            writer.newLine()
+        }
+    }
 }
+
 
 fun main() {
     val wordsFile = File("words.txt")

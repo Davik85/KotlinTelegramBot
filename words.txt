@@ -7,5 +7,5 @@ house|дом|0
 bye|пока|0
 tomorrow|завтра|0
 yesterday|вчера|0
-monday|понедельник|1
-tuesday|вторник|0
+monday|понедельник|2
+tuesday|вторник|1
