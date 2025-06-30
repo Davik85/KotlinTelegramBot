@@ -1,8 +1,17 @@
 package org.example.WordsFile
 
+import Trainer.DEFAULT_ANSWER_OPTIONS_COUNT
+import Trainer.DEFAULT_LEARNED_THRESHOLD
 import Trainer.LearnWordsTrainer
 
 fun main() {
+    try {
+        LearnWordsTrainer(DEFAULT_LEARNED_THRESHOLD, DEFAULT_ANSWER_OPTIONS_COUNT)
+    } catch (e: Exception) {
+        println("Невозможно загрузить словарь")
+        return
+    }
+
     LearnWordsTrainer.initializeDemoWordsIfNeeded()
     val trainer = LearnWordsTrainer()
 
@@ -51,14 +60,17 @@ fun main() {
                     }
                 }
             }
+
             "2" -> {
                 val (total, learned, percent) = trainer.getStats()
                 println("Выучено $learned из $total слов | $percent%")
             }
+
             "0" -> {
                 println("Выход из программы...")
                 break
             }
+
             else -> println("Введите число 1, 2 или 0")
         }
         println()
