@@ -7,16 +7,27 @@ import java.net.http.HttpResponse
 
 fun main(args: Array<String>) {
 
-    val botToken = args [0]
-    val urlGetMe = "https://api.telegram.org/bot$botToken/getMe"
-    val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates"
+    val botToken = args[0]
+    var updateId = 0
 
+    while (true) {
+        Thread.sleep(2000)
+        val updates: String = getUpdates(botToken, updateId)
+        println(updates)
+
+        val startUpdateID = updates.lastIndexOf("update_id")
+        val endUpdateID = updates.lastIndexOf(",\n\"message\"")
+        if (startUpdateID == -1 || endUpdateID == -1) continue
+        val updateIdString = updates.substring(startUpdateID + 11, endUpdateID)
+        updateId = updateIdString.toInt() + 1
+    }
+}
+
+fun getUpdates(botToken: String, updateId: Int): String {
+    val urlGetUpdates = "https://api.telegram.org/bot$botToken/getUpdates?offset=$updateId"
     val client = HttpClient.newBuilder().build()
-
     val request = HttpRequest.newBuilder().uri(URI.create(urlGetUpdates)).build()
-
     val response = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-    println(response.body())
-
+    return response.body()
 }
