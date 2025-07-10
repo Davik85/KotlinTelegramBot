@@ -1,33 +1,37 @@
 package org.example.Dictionary
 
+const val UPDATE_ID_PATTERN = """"update_id":\s*(\d+)"""
+const val CHAT_ID_PATTERN = """"chat":\s*\{[^}]*"id":\s*(-?\d+)"""
+const val TEXT_PATTERN = """"text":"(.+?)""""
+
 fun main(args: Array<String>) {
     val botToken = args[0]
     var updateId = 0
-    val bot = TelegramBotService(botToken)
+
+    val updateIdRegex = UPDATE_ID_PATTERN.toRegex()
+    val chatIdRegex = CHAT_ID_PATTERN.toRegex()
+    val textRegex = TEXT_PATTERN.toRegex()
+
+    val botService = TelegramBotService(botToken)
 
     while (true) {
         Thread.sleep(2000)
-        val updates = bot.getUpdates(updateId)
+        val updates: String = botService.getUpdates(updateId)
         println(updates)
-
-        val updateIdRegex = "\"update_id\":(\\d+)".toRegex()
-        val chatIdRegex = "\"chat\":\\{\"id\":(\\d+)".toRegex()
-        val textRegex = "\"text\":\"([^\"]+)\"".toRegex()
 
         val updateIdMatch = updateIdRegex.find(updates)
         val chatIdMatch = chatIdRegex.find(updates)
         val textMatch = textRegex.find(updates)
 
-        if (updateIdMatch != null && chatIdMatch != null && textMatch != null) {
-            updateId = updateIdMatch.groupValues[1].toInt() + 1
-            val chatId = chatIdMatch.groupValues[1].toLong()
-            val text = textMatch.groupValues[1]
+        if (updateIdMatch == null || chatIdMatch == null || textMatch == null) continue
 
-            println("chatId: $chatId, text: $text")
+        updateId = updateIdMatch.groupValues[1].toInt() + 1
+        val chatId = chatIdMatch.groupValues[1].toLong()
+        val text = textMatch.groupValues[1]
+        println("Получено сообщение: $text (chatId = $chatId)")
 
-            if (text.equals("hello", ignoreCase = true)) {
-                bot.sendMessage(chatId, "Hello")
-            }
+        if (text.equals("hello", ignoreCase = true)) {
+            botService.sendMessage(chatId, "Hello")
         }
     }
 }
