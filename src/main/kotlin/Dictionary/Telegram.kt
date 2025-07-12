@@ -21,31 +21,25 @@ fun main(args: Array<String>) {
         val updates: String = botService.getUpdates(updateId)
         println(updates)
 
-        val updateIdMatch = updateIdRegex.find(updates)
-        if (updateIdMatch != null) {
-            updateId = updateIdMatch.groupValues[1].toInt() + 1
-        }
+        val receivedUpdateId = updateIdRegex.find(updates)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: continue
+        updateId = receivedUpdateId + 1
 
-        val chatIdMatch = chatIdRegex.find(updates)
-        val chatId = chatIdMatch?.groupValues?.get(1)?.toLongOrNull()
-        val textMatch = textRegex.find(updates)
-        val text = textMatch?.groupValues?.get(1)
-        val dataMatch = dataRegex.find(updates)
-        val data = dataMatch?.groupValues?.get(1)
+        val chatId = chatIdRegex.find(updates)?.groupValues?.getOrNull(1)?.toLongOrNull() ?: continue
+        val text = textRegex.find(updates)?.groupValues?.getOrNull(1)
+        val data = dataRegex.find(updates)?.groupValues?.getOrNull(1)
 
-        if (text != null && chatId != null) {
+        if (text != null) {
             println("Получено сообщение: $text (chatId = $chatId)")
             when {
-                text.equals("hello", ignoreCase = true) -> {
-                    botService.sendMessage(chatId, "Hello")
-                }
-                text.equals("/menu", ignoreCase = true) || text.equals("menu", ignoreCase = true) -> {
-                    botService.sendMenu(chatId)
-                }
+                text.equals("hello", ignoreCase = true) -> botService.sendMessage(chatId, "Hello")
+                text.equals("/menu", ignoreCase = true) || text.equals(
+                    "menu",
+                    ignoreCase = true
+                ) -> botService.sendMenu(chatId)
             }
         }
 
-        if (data != null && chatId != null) {
+        if (data != null) {
             when (data.lowercase()) {
                 "statistics_clicked" -> botService.sendMessage(chatId, "Выучено 10 из 10 слов | 100%")
                 "learn_words_clicked" -> botService.sendMessage(chatId, "Давай начнем изучение новых слов!")
@@ -53,3 +47,4 @@ fun main(args: Array<String>) {
         }
     }
 }
+
