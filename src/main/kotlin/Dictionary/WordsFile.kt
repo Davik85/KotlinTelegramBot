@@ -62,8 +62,8 @@ fun main() {
             }
 
             "2" -> {
-                val (total, learned, percent) = trainer.getStats()
-                println("Выучено $learned из $total слов | $percent%")
+                val stats = trainer.getStatistics()
+                println(stats)
             }
 
             "0" -> {
