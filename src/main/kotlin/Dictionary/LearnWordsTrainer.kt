@@ -18,22 +18,23 @@ data class Question(
 )
 
 class LearnWordsTrainer(
-    val learnedThreshold: Int = DEFAULT_LEARNED_THRESHOLD,
-    val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
+    private val learnedThreshold: Int = DEFAULT_LEARNED_THRESHOLD,
+    private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
     private val dictionary: MutableList<Word> = loadDictionary().toMutableList()
 
-    fun getStats(): Triple<Int, Int, Int> {
+    fun getStatistics(): String {
         val total = dictionary.size
         val learned = dictionary.count { it.correctAnswersCount >= learnedThreshold }
         val percent = if (total == 0) 0 else (learned * 100 / total)
-        return Triple(total, learned, percent)
+        return "Выучено $learned из $total слов | $percent%"
     }
 
     fun nextQuestion(): Question? {
         val notLearnedList = dictionary.filter { it.correctAnswersCount < learnedThreshold }
         if (notLearnedList.isEmpty()) return null
+
         val mainPart = notLearnedList.shuffled().take(answerOptionsCount)
         val additionalCount = (answerOptionsCount - mainPart.size).coerceAtLeast(0)
         val additional = dictionary
@@ -41,7 +42,8 @@ class LearnWordsTrainer(
             .shuffled()
             .take(additionalCount)
         val options = (mainPart + additional).distinct().shuffled().take(answerOptionsCount)
-        val correctWord = options.random()
+
+        val correctWord = mainPart.random()
         val correctIndex = options.indexOf(correctWord)
         return Question(options, correctIndex)
     }
@@ -71,15 +73,17 @@ class LearnWordsTrainer(
 
     private fun saveDictionary() {
         val file = File(fileName)
-        file.writeText("")
-        dictionary.forEach { word ->
-            file.appendText("${word.original}|${word.translate}|${word.correctAnswersCount}\n")
+        file.bufferedWriter().use { writer ->
+            dictionary.forEach { word ->
+                writer.write("${word.original}|${word.translate}|${word.correctAnswersCount}")
+                writer.newLine()
+            }
         }
     }
 
     companion object {
         fun initializeDemoWordsIfNeeded() {
-            val wordsFile = File("words.txt")
+            val wordsFile = File(DEFAULT_WORDS_FILE)
             if (!wordsFile.exists() || wordsFile.readText().isBlank()) {
                 wordsFile.writeText(
                     """
@@ -100,4 +104,5 @@ class LearnWordsTrainer(
         }
     }
 }
+
 
