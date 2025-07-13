@@ -1,17 +1,8 @@
 package org.example.WordsFile
 
-import Trainer.DEFAULT_ANSWER_OPTIONS_COUNT
-import Trainer.DEFAULT_LEARNED_THRESHOLD
 import Trainer.LearnWordsTrainer
 
 fun main() {
-    try {
-        LearnWordsTrainer(DEFAULT_LEARNED_THRESHOLD, DEFAULT_ANSWER_OPTIONS_COUNT)
-    } catch (e: Exception) {
-        println("Невозможно загрузить словарь")
-        return
-    }
-
     LearnWordsTrainer.initializeDemoWordsIfNeeded()
     val trainer = LearnWordsTrainer()
 
@@ -76,8 +67,3 @@ fun main() {
         println()
     }
 }
-
-
-
-
-
