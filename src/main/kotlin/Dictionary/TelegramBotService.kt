@@ -1,7 +1,7 @@
-package org.example.Dictionary
+package dictionary
 
-import Trainer.Question
 import java.net.URI
+import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -29,7 +29,6 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendMenu(chatId: Long): String {
-        val sendMessageUrl = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val sendMenuBody = """
             {
                 "chat_id": $chatId,
@@ -54,6 +53,31 @@ class TelegramBotService(private val botToken: String) {
         return sendJson(sendMenuBody)
     }
 
+    fun sendQuestion(chatId: Long, question: Question) {
+        val questionText = question.options[question.correctIndex].original.replace("\"", "\\\"")
+        val keyboardButtons = question.options.mapIndexed { idx, word ->
+            """
+                {
+                    "text": "${word.translate.replace("\"", "\\\"")}",
+                    "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$idx"
+                }
+            """.trimIndent()
+        }.joinToString(",\n")
+        val inlineKeyboard = "[ $keyboardButtons ]"
+        val jsonBody = """
+            {
+                "chat_id": $chatId,
+                "text": "$questionText",
+                "reply_markup": {
+                    "inline_keyboard": [
+                        $inlineKeyboard
+                    ]
+                }
+            }
+        """.trimIndent()
+        sendJson(jsonBody)
+    }
+
     fun sendJson(jsonBody: String): String {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val request = HttpRequest.newBuilder()
@@ -65,32 +89,6 @@ class TelegramBotService(private val botToken: String) {
         return response.body()
     }
 
-    fun sendQuestion(chatId: Long, question: Question) {
-        val questionText = question.options[question.correctIndex].original
-        val keyboard = question.options.mapIndexed { idx, word ->
-            """
-                {
-                    "text": "${word.translate}",
-                    "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$idx"
-                }
-            """
-        }.joinToString(",\n", "[", "]")
-
-        val jsonBody = """
-            {
-                "chat_id": $chatId,
-                "text": "$questionText",
-                "reply_markup": {
-                    "inline_keyboard": [
-                        $keyboard
-                    ]
-                }
-            }
-        """.trimIndent()
-
-        sendJson(jsonBody)
-    }
-
     private fun encodeURIComponent(text: String): String =
-        java.net.URLEncoder.encode(text, "UTF-8")
+        URLEncoder.encode(text, "UTF-8")
 }

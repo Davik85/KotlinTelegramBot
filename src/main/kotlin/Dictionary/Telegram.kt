@@ -1,12 +1,13 @@
-package org.example.Dictionary
-
-import Trainer.LearnWordsTrainer
-import Trainer.Question
+package dictionary
 
 const val UPDATE_ID_PATTERN = """"update_id":\s*(\d+)"""
 const val CHAT_ID_PATTERN = """"chat":\s*\{[^}]*"id":\s*(-?\d+)"""
 const val TEXT_PATTERN = """"text":"(.+?)""""
 const val DATA_PATTERN = """"data":"(.+?)""""
+
+const val COMMAND_MENU = "/menu"
+const val COMMAND_START = "/start"
+const val COMMAND_MENU_WORD = "menu"
 
 fun main(args: Array<String>) {
     val botToken = args[0]
@@ -20,7 +21,6 @@ fun main(args: Array<String>) {
     val botService = TelegramBotService(botToken)
     LearnWordsTrainer.initializeDemoWordsIfNeeded()
     val trainer = LearnWordsTrainer()
-    var lastQuestion: Question? = null
 
     while (true) {
         Thread.sleep(2000)
@@ -36,10 +36,12 @@ fun main(args: Array<String>) {
 
         if (text != null) {
             println("Получено сообщение: $text (chatId = $chatId)")
-            when {
-                text.equals("hello", ignoreCase = true) -> botService.sendMessage(chatId, "Hello")
-                text.equals("/menu", ignoreCase = true) || text.equals("menu", ignoreCase = true) ->
-                    botService.sendMenu(chatId)
+            if (
+                text.equals(COMMAND_MENU, ignoreCase = true)
+                || text.equals(COMMAND_START, ignoreCase = true)
+                || text.equals(COMMAND_MENU_WORD, ignoreCase = true)
+            ) {
+                botService.sendMenu(chatId)
             }
         }
 
@@ -49,27 +51,24 @@ fun main(args: Array<String>) {
                     val stats = trainer.getStatistics()
                     botService.sendMessage(chatId, stats)
                 }
-
                 data == CALLBACK_LEARN_WORDS_CLICKED -> {
-                    checkNextQuestionAndSend(trainer, botService, chatId).also {
-                        lastQuestion = it
-                    }
+                    checkNextQuestionAndSend(trainer, botService, chatId)
                 }
-
-                data.startsWith(CALLBACK_DATA_ANSWER_PREFIX) && lastQuestion != null -> {
+                data.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
                     val answerIdx = data.removePrefix(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
-                    if (answerIdx != null) {
-                        if (answerIdx == lastQuestion!!.correctIndex) {
+                    val currentQuestion = trainer.getCurrentQuestion()
+                    if (answerIdx != null && currentQuestion != null) {
+                        if (answerIdx == currentQuestion.correctIndex) {
                             botService.sendMessage(chatId, "Правильно!")
-                            trainer.incrementCorrect(lastQuestion!!)
+                            trainer.incrementCorrect(currentQuestion)
                         } else {
-                            val correct = lastQuestion!!.options[lastQuestion!!.correctIndex]
+                            val correct = currentQuestion.options[currentQuestion.correctIndex]
                             botService.sendMessage(
                                 chatId,
                                 "Неправильно! ${correct.original} – это ${correct.translate}"
                             )
                         }
-                        lastQuestion = checkNextQuestionAndSend(trainer, botService, chatId)
+                        checkNextQuestionAndSend(trainer, botService, chatId)
                     }
                 }
             }
@@ -77,17 +76,17 @@ fun main(args: Array<String>) {
     }
 }
 
+
 fun checkNextQuestionAndSend(
     trainer: LearnWordsTrainer,
     botService: TelegramBotService,
     chatId: Long
-): Question? {
+) {
     val question = trainer.nextQuestion()
+    trainer.setCurrentQuestion(question)
     if (question == null) {
         botService.sendMessage(chatId, "Все слова в словаре выучены")
-        return null
     } else {
         botService.sendQuestion(chatId, question)
-        return question
     }
 }
