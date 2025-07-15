@@ -1,11 +1,11 @@
 hello|привет|0
-dog|собака|1
+dog|собака|3
 cat|кошка|1
-table|стол|2
+table|стол|3
 chair|стул|0
 house|дом|0
 bye|пока|0
-tomorrow|завтра|0
+tomorrow|завтра|1
 yesterday|вчера|0
 monday|понедельник|3
 tuesday|вторник|2

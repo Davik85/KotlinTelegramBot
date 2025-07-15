@@ -1,11 +1,15 @@
-package org.example.Dictionary
+package dictionary
 
 import java.net.URI
+import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 const val TELEGRAM_API_BASE_URL = "https://api.telegram.org"
+const val CALLBACK_LEARN_WORDS_CLICKED = "learn_words_clicked"
+const val CALLBACK_STATISTICS_CLICKED = "statistics_clicked"
+const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 
 class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
@@ -25,7 +29,6 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendMenu(chatId: Long): String {
-        val sendMessageUrl = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val sendMenuBody = """
             {
                 "chat_id": $chatId,
@@ -35,11 +38,11 @@ class TelegramBotService(private val botToken: String) {
                         [
                             {
                                 "text": "Изучить слова",
-                                "callback_data": "learn_words_clicked"
+                                "callback_data": "$CALLBACK_LEARN_WORDS_CLICKED"
                             },
                             {
                                 "text": "Статистика",
-                                "callback_data": "statistics_clicked"
+                                "callback_data": "$CALLBACK_STATISTICS_CLICKED"
                             }
                         ]
                     ]
@@ -47,15 +50,45 @@ class TelegramBotService(private val botToken: String) {
             }
         """.trimIndent()
 
+        return sendJson(sendMenuBody)
+    }
+
+    fun sendQuestion(chatId: Long, question: Question) {
+        val questionText = question.options[question.correctIndex].original.replace("\"", "\\\"")
+        val keyboardButtons = question.options.mapIndexed { idx, word ->
+            """
+                {
+                    "text": "${word.translate.replace("\"", "\\\"")}",
+                    "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$idx"
+                }
+            """.trimIndent()
+        }.joinToString(",\n")
+        val inlineKeyboard = "[ $keyboardButtons ]"
+        val jsonBody = """
+            {
+                "chat_id": $chatId,
+                "text": "$questionText",
+                "reply_markup": {
+                    "inline_keyboard": [
+                        $inlineKeyboard
+                    ]
+                }
+            }
+        """.trimIndent()
+        sendJson(jsonBody)
+    }
+
+    fun sendJson(jsonBody: String): String {
+        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val request = HttpRequest.newBuilder()
-            .uri(URI.create(sendMessageUrl))
+            .uri(URI.create(url))
             .header("Content-Type", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(sendMenuBody))
+            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
             .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
 
     private fun encodeURIComponent(text: String): String =
-        java.net.URLEncoder.encode(text, "UTF-8")
+        URLEncoder.encode(text, "UTF-8")
 }

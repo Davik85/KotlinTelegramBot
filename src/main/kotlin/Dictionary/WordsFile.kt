@@ -1,17 +1,6 @@
-package org.example.WordsFile
-
-import Trainer.DEFAULT_ANSWER_OPTIONS_COUNT
-import Trainer.DEFAULT_LEARNED_THRESHOLD
-import Trainer.LearnWordsTrainer
+package dictionary
 
 fun main() {
-    try {
-        LearnWordsTrainer(DEFAULT_LEARNED_THRESHOLD, DEFAULT_ANSWER_OPTIONS_COUNT)
-    } catch (e: Exception) {
-        println("Невозможно загрузить словарь")
-        return
-    }
-
     LearnWordsTrainer.initializeDemoWordsIfNeeded()
     val trainer = LearnWordsTrainer()
 
@@ -20,64 +9,58 @@ fun main() {
         println("${it.original} — ${it.translate}, правильных ответов: ${it.correctAnswersCount}")
     }
 
-    while (true) {
-        println(
-            """
-            Меню:
-            1 – Учить слова
-            2 – Статистика
-            0 – Выход
-            """.trimIndent()
-        )
+    val MENU_PROMPT = """
+        Меню:
+        1 – Учить слова
+        2 – Статистика
+        0 – Выход
+    """.trimIndent()
+
+    val WRONG_INPUT_MSG = "Введите число 1, 2 или 0"
+
+    loop@ while (true) {
+        println(MENU_PROMPT)
         print("Введите пункт меню: ")
         when (readLine()?.trim()) {
-            "1" -> {
-                while (true) {
-                    val question = trainer.nextQuestion()
-                    if (question == null) {
-                        println("Все слова в словаре выучены")
-                        break
-                    }
-                    println("\n${question.options[question.correctIndex].original}:")
-                    question.options.map { it.translate }.forEachIndexed { i, variant ->
-                        println(" ${i + 1} - $variant")
-                    }
-                    println("----------")
-                    println(" 0 - Меню")
-                    print("Ваш ответ (номер): ")
-                    val userAnswerInput = readLine()?.trim()
-                    if (userAnswerInput == "0") break
-                    val userAnswer = userAnswerInput?.toIntOrNull()
-                    if (userAnswer == null || userAnswer !in 1..question.options.size) {
-                        println("Введите номер варианта ответа от 1 до ${question.options.size}, или 0 для возврата в меню.")
-                        continue
-                    }
-                    if (trainer.checkAnswer(question, userAnswer)) {
-                        println("Правильно!")
-                        trainer.incrementCorrect(question)
-                    } else {
-                        println("Неправильно! ${question.options[question.correctIndex].original} – это ${question.options[question.correctIndex].translate}")
-                    }
-                }
-            }
-
-            "2" -> {
-                val stats = trainer.getStatistics()
-                println(stats)
-            }
-
+            "1" -> studyWords(trainer)
+            "2" -> println(trainer.getStatistics())
             "0" -> {
                 println("Выход из программы...")
-                break
+                break@loop
             }
-
-            else -> println("Введите число 1, 2 или 0")
+            else -> println(WRONG_INPUT_MSG)
         }
         println()
     }
 }
 
-
-
-
-
+private fun studyWords(trainer: LearnWordsTrainer) {
+    while (true) {
+        val question = trainer.nextQuestion()
+        if (question == null) {
+            println("Все слова в словаре выучены")
+            break
+        }
+        println("\n${question.options[question.correctIndex].original}:")
+        question.options.forEachIndexed { i, variant ->
+            println(" ${i + 1} - ${variant.translate}")
+        }
+        println("----------")
+        println(" 0 - Меню")
+        print("Ваш ответ (номер): ")
+        val userAnswerInput = readLine()?.trim()
+        if (userAnswerInput == "0") break
+        val userAnswer = userAnswerInput?.toIntOrNull()
+        if (userAnswer == null || userAnswer !in 1..question.options.size) {
+            println("Введите номер варианта ответа от 1 до ${question.options.size}, или 0 для возврата в меню.")
+            continue
+        }
+        if (trainer.checkAnswer(question, userAnswer)) {
+            println("Правильно!")
+            trainer.incrementCorrect(question)
+        } else {
+            val correct = question.options[question.correctIndex]
+            println("Неправильно! ${correct.original} – это ${correct.translate}")
+        }
+    }
+}

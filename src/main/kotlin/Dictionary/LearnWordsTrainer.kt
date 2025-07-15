@@ -1,4 +1,4 @@
-package Trainer
+package dictionary
 
 import java.io.File
 
@@ -23,6 +23,7 @@ class LearnWordsTrainer(
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
     private val dictionary: MutableList<Word> = loadDictionary().toMutableList()
+    private var currentQuestion: Question? = null // новое поле
 
     fun getStatistics(): String {
         val total = dictionary.size
@@ -33,7 +34,10 @@ class LearnWordsTrainer(
 
     fun nextQuestion(): Question? {
         val notLearnedList = dictionary.filter { it.correctAnswersCount < learnedThreshold }
-        if (notLearnedList.isEmpty()) return null
+        if (notLearnedList.isEmpty()) {
+            currentQuestion = null
+            return null
+        }
 
         val mainPart = notLearnedList.shuffled().take(answerOptionsCount)
         val additionalCount = (answerOptionsCount - mainPart.size).coerceAtLeast(0)
@@ -45,7 +49,9 @@ class LearnWordsTrainer(
 
         val correctWord = mainPart.random()
         val correctIndex = options.indexOf(correctWord)
-        return Question(options, correctIndex)
+        val question = Question(options, correctIndex)
+        currentQuestion = question
+        return question
     }
 
     fun checkAnswer(question: Question, userAnswer: Int): Boolean {
@@ -55,6 +61,12 @@ class LearnWordsTrainer(
     fun incrementCorrect(question: Question) {
         question.options[question.correctIndex].correctAnswersCount++
         saveDictionary()
+    }
+
+    fun getCurrentQuestion(): Question? = currentQuestion
+
+    fun setCurrentQuestion(question: Question?) {
+        currentQuestion = question
     }
 
     fun getDictionary(): List<Word> = dictionary
@@ -104,5 +116,3 @@ class LearnWordsTrainer(
         }
     }
 }
-
-
