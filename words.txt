@@ -8,4 +8,4 @@ bye|пока|0
 tomorrow|завтра|1
 yesterday|вчера|0
 monday|понедельник|3
-tuesday|вторник|2
+tuesday|вторник|3

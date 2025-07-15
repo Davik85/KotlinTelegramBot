@@ -23,7 +23,17 @@ class LearnWordsTrainer(
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
     private val dictionary: MutableList<Word> = loadDictionary().toMutableList()
-    private var currentQuestion: Question? = null // новое поле
+    private var currentQuestion: Question? = null
+
+    fun checkNextQuestionAndSend(botService: TelegramBotService, chatId: Long) {
+        val question = nextQuestion()
+        setCurrentQuestion(question)
+        if (question == null) {
+            botService.sendMessage(chatId, "Все слова в словаре выучены")
+        } else {
+            botService.sendQuestion(chatId, question)
+        }
+    }
 
     fun getStatistics(): String {
         val total = dictionary.size
@@ -38,7 +48,6 @@ class LearnWordsTrainer(
             currentQuestion = null
             return null
         }
-
         val mainPart = notLearnedList.shuffled().take(answerOptionsCount)
         val additionalCount = (answerOptionsCount - mainPart.size).coerceAtLeast(0)
         val additional = dictionary
@@ -54,21 +63,19 @@ class LearnWordsTrainer(
         return question
     }
 
-    fun checkAnswer(question: Question, userAnswer: Int): Boolean {
-        return userAnswer == (question.correctIndex + 1)
+    fun checkAnswer(userAnswerIndex: Int): Boolean {
+        val q = currentQuestion ?: return false
+        return userAnswerIndex == q.correctIndex
     }
 
-    fun incrementCorrect(question: Question) {
-        question.options[question.correctIndex].correctAnswersCount++
+    fun incrementCorrect() {
+        val q = currentQuestion ?: return
+        q.options[q.correctIndex].correctAnswersCount++
         saveDictionary()
     }
 
     fun getCurrentQuestion(): Question? = currentQuestion
-
-    fun setCurrentQuestion(question: Question?) {
-        currentQuestion = question
-    }
-
+    fun setCurrentQuestion(question: Question?) { currentQuestion = question }
     fun getDictionary(): List<Word> = dictionary
 
     private fun loadDictionary(): List<Word> {

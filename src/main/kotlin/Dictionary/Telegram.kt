@@ -10,6 +10,10 @@ const val COMMAND_START = "/start"
 const val COMMAND_MENU_WORD = "menu"
 
 fun main(args: Array<String>) {
+    if (args.isEmpty()) {
+        println("Ошибка: Необходимо передать токен бота в качестве аргумента командной строки.")
+        return
+    }
     val botToken = args[0]
     var updateId = 0
 
@@ -52,41 +56,29 @@ fun main(args: Array<String>) {
                     botService.sendMessage(chatId, stats)
                 }
                 data == CALLBACK_LEARN_WORDS_CLICKED -> {
-                    checkNextQuestionAndSend(trainer, botService, chatId)
+                    trainer.checkNextQuestionAndSend(botService, chatId)
                 }
                 data.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
                     val answerIdx = data.removePrefix(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
-                    val currentQuestion = trainer.getCurrentQuestion()
-                    if (answerIdx != null && currentQuestion != null) {
-                        if (answerIdx == currentQuestion.correctIndex) {
+                    if (answerIdx != null) {
+                        val isCorrect = trainer.checkAnswer(answerIdx)
+                        if (isCorrect) {
                             botService.sendMessage(chatId, "Правильно!")
-                            trainer.incrementCorrect(currentQuestion)
+                            trainer.incrementCorrect()
                         } else {
-                            val correct = currentQuestion.options[currentQuestion.correctIndex]
-                            botService.sendMessage(
-                                chatId,
-                                "Неправильно! ${correct.original} – это ${correct.translate}"
-                            )
+                            val currentQuestion = trainer.getCurrentQuestion()
+                            if (currentQuestion != null) {
+                                val correct = currentQuestion.options[currentQuestion.correctIndex]
+                                botService.sendMessage(
+                                    chatId,
+                                    "Неправильно! ${correct.original} – это ${correct.translate}"
+                                )
+                            }
                         }
-                        checkNextQuestionAndSend(trainer, botService, chatId)
+                        trainer.checkNextQuestionAndSend(botService, chatId)
                     }
                 }
             }
         }
-    }
-}
-
-
-fun checkNextQuestionAndSend(
-    trainer: LearnWordsTrainer,
-    botService: TelegramBotService,
-    chatId: Long
-) {
-    val question = trainer.nextQuestion()
-    trainer.setCurrentQuestion(question)
-    if (question == null) {
-        botService.sendMessage(chatId, "Все слова в словаре выучены")
-    } else {
-        botService.sendQuestion(chatId, question)
     }
 }

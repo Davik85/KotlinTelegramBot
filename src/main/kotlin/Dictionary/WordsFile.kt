@@ -3,7 +3,6 @@ package dictionary
 fun main() {
     LearnWordsTrainer.initializeDemoWordsIfNeeded()
     val trainer = LearnWordsTrainer()
-
     println("Словарь:")
     trainer.getDictionary().forEach {
         println("${it.original} — ${it.translate}, правильных ответов: ${it.correctAnswersCount}")
@@ -28,6 +27,7 @@ fun main() {
                 println("Выход из программы...")
                 break@loop
             }
+
             else -> println(WRONG_INPUT_MSG)
         }
         println()
@@ -41,6 +41,8 @@ private fun studyWords(trainer: LearnWordsTrainer) {
             println("Все слова в словаре выучены")
             break
         }
+        trainer.setCurrentQuestion(question)
+
         println("\n${question.options[question.correctIndex].original}:")
         question.options.forEachIndexed { i, variant ->
             println(" ${i + 1} - ${variant.translate}")
@@ -55,9 +57,9 @@ private fun studyWords(trainer: LearnWordsTrainer) {
             println("Введите номер варианта ответа от 1 до ${question.options.size}, или 0 для возврата в меню.")
             continue
         }
-        if (trainer.checkAnswer(question, userAnswer)) {
+        if (trainer.checkAnswer(userAnswer - 1)) {
             println("Правильно!")
-            trainer.incrementCorrect(question)
+            trainer.incrementCorrect()
         } else {
             val correct = question.options[question.correctIndex]
             println("Неправильно! ${correct.original} – это ${correct.translate}")
