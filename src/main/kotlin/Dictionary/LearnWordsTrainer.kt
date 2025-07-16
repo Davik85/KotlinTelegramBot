@@ -14,8 +14,13 @@ class LearnWordsTrainer(
     private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private val dictionary: List<Word> = loadDictionary()
+    private val dictionary: List<Word>
     private var currentQuestion: Question? = null
+
+    init {
+        initializeDemoWordsIfNeeded(fileName)
+        dictionary = loadDictionary()
+    }
 
     fun getStatistics(): String {
         val total = dictionary.size
@@ -78,10 +83,10 @@ class LearnWordsTrainer(
     }
 
     companion object {
-        fun initializeDemoWordsIfNeeded() {
-            val wordsFile = File(DEFAULT_WORDS_FILE)
-            if (!wordsFile.exists() || wordsFile.readText().isBlank()) {
-                wordsFile.writeText(
+        fun initializeDemoWordsIfNeeded(fileName: String) {
+            val file = File(fileName)
+            if (!file.exists() || file.readText().isBlank()) {
+                file.writeText(
                     """
                     hello|привет|0
                     dog|собака|0

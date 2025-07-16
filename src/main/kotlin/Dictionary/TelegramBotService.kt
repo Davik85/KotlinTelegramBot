@@ -1,7 +1,7 @@
 package dictionary
 
+import kotlinx.serialization.json.Json
 import java.net.URI
-import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
@@ -13,83 +13,54 @@ const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 
 class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
+    private val json = Json { ignoreUnknownKeys = true }
 
-    fun getUpdates(offset: Int): String {
+    fun getUpdates(offset: Long): String {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset"
         val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
 
-    fun sendMessage(chatId: Long, text: String): String {
-        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage?chat_id=$chatId&text=${encodeURIComponent(text)}"
-        val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+    fun sendMessage(chatId: Long, text: String) {
+        val body = SendMessageRequest(chatId = chatId, text = text)
+        sendJson(json.encodeToString(body))
     }
 
-    fun sendMenu(chatId: Long): String {
-        val sendMenuBody = """
-            {
-                "chat_id": $chatId,
-                "text": "Основное меню",
-                "reply_markup": {
-                    "inline_keyboard": [
-                        [
-                            {
-                                "text": "Изучить слова",
-                                "callback_data": "$CALLBACK_LEARN_WORDS_CLICKED"
-                            },
-                            {
-                                "text": "Статистика",
-                                "callback_data": "$CALLBACK_STATISTICS_CLICKED"
-                            }
-                        ]
-                    ]
-                }
-            }
-        """.trimIndent()
-
-        return sendJson(sendMenuBody)
+    fun sendMenu(chatId: Long) {
+        val menuKeyboard = listOf(
+            listOf(
+                InlineKeyboardButton("Изучить слова", CALLBACK_LEARN_WORDS_CLICKED),
+                InlineKeyboardButton("Статистика", CALLBACK_STATISTICS_CLICKED)
+            )
+        )
+        val body = SendMessageRequest(
+            chatId = chatId,
+            text = "Основное меню",
+            replyMarkup = ReplyMarkup(menuKeyboard)
+        )
+        sendJson(json.encodeToString(body))
     }
 
     fun sendQuestion(chatId: Long, question: Question) {
-        val questionText = question.options[question.correctIndex].original
-        val keyboard = question.options.mapIndexed { idx, word ->
-            """
-                {
-                    "text": "${word.translate}",
-                    "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$idx"
-                }
-            """
-        }.joinToString(",\n", "[", "]")
-
-        val jsonBody = """
-            {
-                "chat_id": $chatId,
-                "text": "$questionText",
-                "reply_markup": {
-                    "inline_keyboard": [
-                        $keyboard
-                    ]
-                }
-            }
-        """.trimIndent()
-
-        sendJson(jsonBody)
+        val keyboard = listOf(question.options.mapIndexed { idx, word ->
+            InlineKeyboardButton(word.translate, "$CALLBACK_DATA_ANSWER_PREFIX$idx")
+        })
+        val body = SendMessageRequest(
+            chatId = chatId,
+            text = question.options[question.correctIndex].original,
+            replyMarkup = ReplyMarkup(keyboard)
+        )
+        sendJson(json.encodeToString(body))
     }
 
-    private fun sendJson(jsonBody: String): String {
+    private fun sendJson(jsonBody: String) {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
             .build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        client.send(request, HttpResponse.BodyHandlers.ofString())
     }
-
-    private fun encodeURIComponent(text: String): String =
-        URLEncoder.encode(text, "UTF-8")
 }
