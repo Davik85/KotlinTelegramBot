@@ -54,31 +54,32 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendQuestion(chatId: Long, question: Question) {
-        val questionText = question.options[question.correctIndex].original.replace("\"", "\\\"")
-        val keyboardButtons = question.options.mapIndexed { idx, word ->
+        val questionText = question.options[question.correctIndex].original
+        val keyboard = question.options.mapIndexed { idx, word ->
             """
                 {
-                    "text": "${word.translate.replace("\"", "\\\"")}",
+                    "text": "${word.translate}",
                     "callback_data": "$CALLBACK_DATA_ANSWER_PREFIX$idx"
                 }
-            """.trimIndent()
-        }.joinToString(",\n")
-        val inlineKeyboard = "[ $keyboardButtons ]"
+            """
+        }.joinToString(",\n", "[", "]")
+
         val jsonBody = """
             {
                 "chat_id": $chatId,
                 "text": "$questionText",
                 "reply_markup": {
                     "inline_keyboard": [
-                        $inlineKeyboard
+                        $keyboard
                     ]
                 }
             }
         """.trimIndent()
+
         sendJson(jsonBody)
     }
 
-    fun sendJson(jsonBody: String): String {
+    private fun sendJson(jsonBody: String): String {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))

@@ -55,16 +55,22 @@ fun main(args: Array<String>) {
                     val stats = trainer.getStatistics()
                     botService.sendMessage(chatId, stats)
                 }
+
                 data == CALLBACK_LEARN_WORDS_CLICKED -> {
-                    trainer.checkNextQuestionAndSend(botService, chatId)
+                    val question = trainer.nextQuestion()
+                    if (question == null) {
+                        botService.sendMessage(chatId, "Все слова в словаре выучены")
+                    } else {
+                        botService.sendQuestion(chatId, question)
+                    }
                 }
+
                 data.startsWith(CALLBACK_DATA_ANSWER_PREFIX) -> {
                     val answerIdx = data.removePrefix(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
                     if (answerIdx != null) {
                         val isCorrect = trainer.checkAnswer(answerIdx)
                         if (isCorrect) {
                             botService.sendMessage(chatId, "Правильно!")
-                            trainer.incrementCorrect()
                         } else {
                             val currentQuestion = trainer.getCurrentQuestion()
                             if (currentQuestion != null) {
@@ -75,7 +81,12 @@ fun main(args: Array<String>) {
                                 )
                             }
                         }
-                        trainer.checkNextQuestionAndSend(botService, chatId)
+                        val question = trainer.nextQuestion()
+                        if (question == null) {
+                            botService.sendMessage(chatId, "Все слова в словаре выучены")
+                        } else {
+                            botService.sendQuestion(chatId, question)
+                        }
                     }
                 }
             }
