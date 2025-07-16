@@ -18,16 +18,17 @@ fun main() {
 
     val WRONG_INPUT_MSG = "Введите число 1, 2 или 0"
 
-    loop@ while (true) {
+    while (true) {
         println(MENU_PROMPT)
         print("Введите пункт меню: ")
-        when (readLine()?.trim()) {
+        when (readlnOrNull()?.trim()) {
             "1" -> studyWords(trainer)
             "2" -> println(trainer.getStatistics())
             "0" -> {
                 println("Выход из программы...")
-                break@loop
+                break
             }
+
             else -> println(WRONG_INPUT_MSG)
         }
         println()
@@ -41,6 +42,7 @@ private fun studyWords(trainer: LearnWordsTrainer) {
             println("Все слова в словаре выучены")
             break
         }
+
         println("\n${question.options[question.correctIndex].original}:")
         question.options.forEachIndexed { i, variant ->
             println(" ${i + 1} - ${variant.translate}")
@@ -48,16 +50,16 @@ private fun studyWords(trainer: LearnWordsTrainer) {
         println("----------")
         println(" 0 - Меню")
         print("Ваш ответ (номер): ")
-        val userAnswerInput = readLine()?.trim()
+        val userAnswerInput = readlnOrNull()?.trim()
         if (userAnswerInput == "0") break
         val userAnswer = userAnswerInput?.toIntOrNull()
         if (userAnswer == null || userAnswer !in 1..question.options.size) {
             println("Введите номер варианта ответа от 1 до ${question.options.size}, или 0 для возврата в меню.")
             continue
         }
-        if (trainer.checkAnswer(question, userAnswer)) {
+
+        if (trainer.checkAnswer(userAnswer - 1)) {
             println("Правильно!")
-            trainer.incrementCorrect(question)
         } else {
             val correct = question.options[question.correctIndex]
             println("Неправильно! ${correct.original} – это ${correct.translate}")

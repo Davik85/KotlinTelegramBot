@@ -6,24 +6,16 @@ const val DEFAULT_LEARNED_THRESHOLD = 3
 const val DEFAULT_ANSWER_OPTIONS_COUNT = 4
 const val DEFAULT_WORDS_FILE = "words.txt"
 
-data class Word(
-    val original: String,
-    val translate: String,
-    var correctAnswersCount: Int = 0
-)
-
-data class Question(
-    val options: List<Word>,
-    val correctIndex: Int
-)
+data class Word(val original: String, val translate: String, var correctAnswersCount: Int = 0)
+data class Question(val options: List<Word>, val correctIndex: Int)
 
 class LearnWordsTrainer(
     private val learnedThreshold: Int = DEFAULT_LEARNED_THRESHOLD,
     private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private val dictionary: MutableList<Word> = loadDictionary().toMutableList()
-    private var currentQuestion: Question? = null // новое поле
+    private val dictionary: List<Word> = loadDictionary()
+    private var currentQuestion: Question? = null
 
     fun getStatistics(): String {
         val total = dictionary.size
@@ -33,42 +25,34 @@ class LearnWordsTrainer(
     }
 
     fun nextQuestion(): Question? {
-        val notLearnedList = dictionary.filter { it.correctAnswersCount < learnedThreshold }
-        if (notLearnedList.isEmpty()) {
+        val notLearned = dictionary.filter { it.correctAnswersCount < learnedThreshold }
+        if (notLearned.isEmpty()) {
             currentQuestion = null
             return null
         }
-
-        val mainPart = notLearnedList.shuffled().take(answerOptionsCount)
-        val additionalCount = (answerOptionsCount - mainPart.size).coerceAtLeast(0)
+        val mainPart = notLearned.shuffled().take(answerOptionsCount)
         val additional = dictionary
             .filter { it.correctAnswersCount >= learnedThreshold }
             .shuffled()
-            .take(additionalCount)
+            .take((answerOptionsCount - mainPart.size).coerceAtLeast(0))
         val options = (mainPart + additional).distinct().shuffled().take(answerOptionsCount)
-
         val correctWord = mainPart.random()
         val correctIndex = options.indexOf(correctWord)
-        val question = Question(options, correctIndex)
-        currentQuestion = question
-        return question
+        currentQuestion = Question(options, correctIndex)
+        return currentQuestion
     }
 
-    fun checkAnswer(question: Question, userAnswer: Int): Boolean {
-        return userAnswer == (question.correctIndex + 1)
-    }
-
-    fun incrementCorrect(question: Question) {
-        question.options[question.correctIndex].correctAnswersCount++
-        saveDictionary()
+    fun checkAnswer(userAnswerIndex: Int): Boolean {
+        val question = currentQuestion ?: return false
+        val isCorrect = userAnswerIndex == question.correctIndex
+        if (isCorrect) {
+            question.options[question.correctIndex].correctAnswersCount++
+            saveDictionary()
+        }
+        return isCorrect
     }
 
     fun getCurrentQuestion(): Question? = currentQuestion
-
-    fun setCurrentQuestion(question: Question?) {
-        currentQuestion = question
-    }
-
     fun getDictionary(): List<Word> = dictionary
 
     private fun loadDictionary(): List<Word> {
