@@ -1,8 +1,8 @@
 package dictionary
 
 fun main() {
-    LearnWordsTrainer.initializeDemoWordsIfNeeded()
-    val trainer = LearnWordsTrainer()
+    LearnWordsTrainer.initializeDemoWordsIfNeeded(DEFAULT_WORDS_FILE)
+    val trainer = LearnWordsTrainer(fileName = DEFAULT_WORDS_FILE)
 
     println("Словарь:")
     trainer.getDictionary().forEach {
@@ -28,7 +28,6 @@ fun main() {
                 println("Выход из программы...")
                 break
             }
-
             else -> println(WRONG_INPUT_MSG)
         }
         println()

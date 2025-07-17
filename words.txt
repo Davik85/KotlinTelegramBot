@@ -2,7 +2,7 @@ hello|привет|0
 dog|собака|3
 cat|кошка|1
 table|стол|3
-chair|стул|0
+chair|стул|1
 house|дом|0
 bye|пока|1
 tomorrow|завтра|1
