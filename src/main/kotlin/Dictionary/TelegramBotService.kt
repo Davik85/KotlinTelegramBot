@@ -15,11 +15,11 @@ class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
     private val json = Json { ignoreUnknownKeys = true }
 
-    fun getUpdates(offset: Long): String {
+    fun getUpdates(offset: Long): TelegramResponse {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset"
         val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        return Json { ignoreUnknownKeys = true }.decodeFromString(response.body())
     }
 
     fun sendMessage(chatId: Long, text: String) {
