@@ -69,7 +69,6 @@ fun main(args: Array<String>) {
     var lastUpdateId = 0L
 
     val botService = TelegramBotService(botToken)
-
     val trainers = mutableMapOf<Long, LearnWordsTrainer>()
 
     while (true) {
@@ -84,13 +83,13 @@ fun main(args: Array<String>) {
             val trainer = trainers.getOrPut(chatId) {
                 LearnWordsTrainer(fileName = "words_$chatId.txt")
             }
+
             val text = update.message?.text
             val data = update.callbackQuery?.data
 
             if (text?.equals(COMMAND_MENU, ignoreCase = true) == true
                 || text?.equals(COMMAND_START, ignoreCase = true) == true
-                || text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true
-            ) {
+                || text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true) {
                 botService.sendMenu(chatId)
                 continue
             }
@@ -100,7 +99,6 @@ fun main(args: Array<String>) {
                     val stats = trainer.getStatistics()
                     botService.sendMessage(chatId, stats)
                 }
-
                 data == CALLBACK_LEARN_WORDS_CLICKED -> {
                     val question = trainer.nextQuestion()
                     if (question == null) {
@@ -109,7 +107,11 @@ fun main(args: Array<String>) {
                         botService.sendQuestion(chatId, question)
                     }
                 }
-
+                data == CALLBACK_RESET_PROGRESS -> {
+                    trainer.resetProgress()
+                    botService.sendMessage(chatId, "Ваш прогресс сброшен! Начните изучение заново.")
+                    botService.sendMenu(chatId)
+                }
                 data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true -> {
                     val answerIdx = data.removePrefix(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
                     if (answerIdx != null) {

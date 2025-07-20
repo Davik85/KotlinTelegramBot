@@ -9,6 +9,7 @@ import java.net.http.HttpResponse
 const val TELEGRAM_API_BASE_URL = "https://api.telegram.org"
 const val CALLBACK_LEARN_WORDS_CLICKED = "learn_words_clicked"
 const val CALLBACK_STATISTICS_CLICKED = "statistics_clicked"
+const val CALLBACK_RESET_PROGRESS = "reset_progress"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
 
 class TelegramBotService(private val botToken: String) {
@@ -19,7 +20,7 @@ class TelegramBotService(private val botToken: String) {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset"
         val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return Json { ignoreUnknownKeys = true }.decodeFromString(response.body())
+        return json.decodeFromString(TelegramResponse.serializer(), response.body())
     }
 
     fun sendMessage(chatId: Long, text: String) {
@@ -32,6 +33,9 @@ class TelegramBotService(private val botToken: String) {
             listOf(
                 InlineKeyboardButton("Изучить слова", CALLBACK_LEARN_WORDS_CLICKED),
                 InlineKeyboardButton("Статистика", CALLBACK_STATISTICS_CLICKED)
+            ),
+            listOf(
+                InlineKeyboardButton("Сбросить прогресс", CALLBACK_RESET_PROGRESS)
             )
         )
         val body = SendMessageRequest(

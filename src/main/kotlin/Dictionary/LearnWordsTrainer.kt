@@ -14,12 +14,12 @@ class LearnWordsTrainer(
     private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private val dictionary: List<Word>
+    private var dictionary: MutableList<Word>
     private var currentQuestion: Question? = null
 
     init {
         initializeDemoWordsIfNeeded(fileName)
-        dictionary = loadDictionary()
+        dictionary = loadDictionary().toMutableList()
     }
 
     fun getStatistics(): String {
@@ -60,6 +60,13 @@ class LearnWordsTrainer(
     fun getCurrentQuestion(): Question? = currentQuestion
     fun getDictionary(): List<Word> = dictionary
 
+    fun resetProgress() {
+        File(fileName).writeText(getDefaultWordsContent())
+        dictionary.clear()
+        dictionary.addAll(loadDictionary())
+        currentQuestion = null
+    }
+
     private fun loadDictionary(): List<Word> {
         val file = File(fileName)
         if (!file.exists()) return emptyList()
@@ -86,22 +93,22 @@ class LearnWordsTrainer(
         fun initializeDemoWordsIfNeeded(fileName: String) {
             val file = File(fileName)
             if (!file.exists() || file.readText().isBlank()) {
-                file.writeText(
-                    """
-                    hello|привет|0
-                    dog|собака|0
-                    cat|кошка|0
-                    table|стол|0
-                    chair|стул|0
-                    house|дом|0
-                    bye|пока|0
-                    tomorrow|завтра|0
-                    yesterday|вчера|0
-                    monday|понедельник|0
-                    tuesday|вторник|0
-                    """.trimIndent()
-                )
+                file.writeText(getDefaultWordsContent())
             }
         }
+
+        private fun getDefaultWordsContent(): String = """
+            hello|привет|0
+            dog|собака|0
+            cat|кошка|0
+            table|стол|0
+            chair|стул|0
+            house|дом|0
+            bye|пока|0
+            tomorrow|завтра|0
+            yesterday|вчера|0
+            monday|понедельник|0
+            tuesday|вторник|0
+        """.trimIndent()
     }
 }
