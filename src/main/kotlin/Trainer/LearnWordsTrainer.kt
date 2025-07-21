@@ -1,32 +1,37 @@
-package dictionary
+package trainer
 
+import model.Word
+import model.Question
+import model.Statistics
 import java.io.File
 
 const val DEFAULT_LEARNED_THRESHOLD = 3
 const val DEFAULT_ANSWER_OPTIONS_COUNT = 4
 const val DEFAULT_WORDS_FILE = "words.txt"
 
-data class Word(val original: String, val translate: String, var correctAnswersCount: Int = 0)
-data class Question(val options: List<Word>, val correctIndex: Int)
-
 class LearnWordsTrainer(
     private val learnedThreshold: Int = DEFAULT_LEARNED_THRESHOLD,
     private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private var dictionary: MutableList<Word>
+    private val dictionary: List<Word>
     private var currentQuestion: Question? = null
 
     init {
         initializeDemoWordsIfNeeded(fileName)
-        dictionary = loadDictionary().toMutableList()
+        dictionary = loadDictionary()
     }
 
-    fun getStatistics(): String {
+    fun getStatistics(): Statistics {
         val total = dictionary.size
         val learned = dictionary.count { it.correctAnswersCount >= learnedThreshold }
         val percent = if (total == 0) 0 else (learned * 100 / total)
-        return "Выучено $learned из $total слов | $percent%"
+        return Statistics(total, learned, percent)
+    }
+
+    fun statisticsString(): String {
+        val stats = getStatistics()
+        return "Выучено ${stats.learned} из ${stats.total} слов | ${stats.percent}%"
     }
 
     fun nextQuestion(): Question? {
@@ -61,9 +66,8 @@ class LearnWordsTrainer(
     fun getDictionary(): List<Word> = dictionary
 
     fun resetProgress() {
-        File(fileName).writeText(getDefaultWordsContent())
-        dictionary.clear()
-        dictionary.addAll(loadDictionary())
+        dictionary.forEach { it.correctAnswersCount = 0 }
+        saveDictionary()
         currentQuestion = null
     }
 
@@ -93,22 +97,22 @@ class LearnWordsTrainer(
         fun initializeDemoWordsIfNeeded(fileName: String) {
             val file = File(fileName)
             if (!file.exists() || file.readText().isBlank()) {
-                file.writeText(getDefaultWordsContent())
+                file.writeText(
+                    """
+                    hello|привет|0
+                    dog|собака|0
+                    cat|кошка|0
+                    table|стол|0
+                    chair|стул|0
+                    house|дом|0
+                    bye|пока|0
+                    tomorrow|завтра|0
+                    yesterday|вчера|0
+                    monday|понедельник|0
+                    tuesday|вторник|0
+                    """.trimIndent()
+                )
             }
         }
-
-        private fun getDefaultWordsContent(): String = """
-            hello|привет|0
-            dog|собака|0
-            cat|кошка|0
-            table|стол|0
-            chair|стул|0
-            house|дом|0
-            bye|пока|0
-            tomorrow|завтра|0
-            yesterday|вчера|0
-            monday|понедельник|0
-            tuesday|вторник|0
-        """.trimIndent()
     }
 }

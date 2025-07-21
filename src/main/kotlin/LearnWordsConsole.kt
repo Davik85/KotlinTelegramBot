@@ -1,4 +1,5 @@
-package dictionary
+import trainer.LearnWordsTrainer
+import trainer.DEFAULT_WORDS_FILE
 
 fun main() {
     LearnWordsTrainer.initializeDemoWordsIfNeeded(DEFAULT_WORDS_FILE)
@@ -13,10 +14,11 @@ fun main() {
         Меню:
         1 – Учить слова
         2 – Статистика
+        3 – Сбросить прогресс
         0 – Выход
     """.trimIndent()
 
-    val WRONG_INPUT_MSG = "Введите число 1, 2 или 0"
+    val WRONG_INPUT_MSG = "Введите число 1, 2, 3 или 0"
 
     while (true) {
         println(MENU_PROMPT)
@@ -24,6 +26,10 @@ fun main() {
         when (readlnOrNull()?.trim()) {
             "1" -> studyWords(trainer)
             "2" -> println(trainer.getStatistics())
+            "3" -> {
+                trainer.resetProgress()
+                println("Прогресс сброшен!")
+            }
             "0" -> {
                 println("Выход из программы...")
                 break
@@ -41,7 +47,6 @@ private fun studyWords(trainer: LearnWordsTrainer) {
             println("Все слова в словаре выучены")
             break
         }
-
         println("\n${question.options[question.correctIndex].original}:")
         question.options.forEachIndexed { i, variant ->
             println(" ${i + 1} - ${variant.translate}")
@@ -56,7 +61,6 @@ private fun studyWords(trainer: LearnWordsTrainer) {
             println("Введите номер варианта ответа от 1 до ${question.options.size}, или 0 для возврата в меню.")
             continue
         }
-
         if (trainer.checkAnswer(userAnswer - 1)) {
             println("Правильно!")
         } else {

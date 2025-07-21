@@ -1,6 +1,8 @@
-package dictionary
+package telegram
 
 import kotlinx.serialization.json.Json
+import telegram.dto.*
+import model.Question
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
