@@ -1,64 +1,14 @@
-package dictionary
-
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import telegram.CALLBACK_DATA_ANSWER_PREFIX
+import telegram.CALLBACK_LEARN_WORDS_CLICKED
+import telegram.CALLBACK_RESET_PROGRESS
+import telegram.CALLBACK_STATISTICS_CLICKED
+import trainer.LearnWordsTrainer
+import telegram.TelegramBotService
+import telegram.dto.*
 
 const val COMMAND_MENU = "/menu"
 const val COMMAND_START = "/start"
 const val COMMAND_MENU_WORD = "menu"
-
-@Serializable
-data class Update(
-    @SerialName("update_id")
-    val updateId: Long,
-    val message: Message? = null,
-    @SerialName("callback_query")
-    val callbackQuery: CallbackQuery? = null,
-)
-
-@Serializable
-data class TelegramResponse(
-    val result: List<Update>
-)
-
-@Serializable
-data class Message(
-    val text: String? = null,
-    val chat: Chat
-)
-
-@Serializable
-data class Chat(
-    val id: Long
-)
-
-@Serializable
-data class CallbackQuery(
-    val data: String? = null,
-    val message: Message? = null
-)
-
-@Serializable
-data class SendMessageRequest(
-    @SerialName("chat_id")
-    val chatId: Long,
-    val text: String,
-    @SerialName("reply_markup")
-    val replyMarkup: ReplyMarkup? = null
-)
-
-@Serializable
-data class ReplyMarkup(
-    @SerialName("inline_keyboard")
-    val inlineKeyboard: List<List<InlineKeyboardButton>>
-)
-
-@Serializable
-data class InlineKeyboardButton(
-    val text: String,
-    @SerialName("callback_data")
-    val callbackData: String
-)
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
@@ -69,7 +19,6 @@ fun main(args: Array<String>) {
     var lastUpdateId = 0L
 
     val botService = TelegramBotService(botToken)
-
     val trainers = mutableMapOf<Long, LearnWordsTrainer>()
 
     while (true) {
@@ -84,23 +33,22 @@ fun main(args: Array<String>) {
             val trainer = trainers.getOrPut(chatId) {
                 LearnWordsTrainer(fileName = "words_$chatId.txt")
             }
+
             val text = update.message?.text
             val data = update.callbackQuery?.data
 
             if (text?.equals(COMMAND_MENU, ignoreCase = true) == true
                 || text?.equals(COMMAND_START, ignoreCase = true) == true
-                || text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true
-            ) {
+                || text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true) {
                 botService.sendMenu(chatId)
                 continue
             }
 
             when {
                 data == CALLBACK_STATISTICS_CLICKED -> {
-                    val stats = trainer.getStatistics()
+                    val stats = trainer.statisticsString()
                     botService.sendMessage(chatId, stats)
                 }
-
                 data == CALLBACK_LEARN_WORDS_CLICKED -> {
                     val question = trainer.nextQuestion()
                     if (question == null) {
@@ -109,7 +57,11 @@ fun main(args: Array<String>) {
                         botService.sendQuestion(chatId, question)
                     }
                 }
-
+                data == CALLBACK_RESET_PROGRESS -> {
+                    trainer.resetProgress()
+                    botService.sendMessage(chatId, "Ваш прогресс сброшен! Начните изучение заново.")
+                    botService.sendMenu(chatId)
+                }
                 data?.startsWith(CALLBACK_DATA_ANSWER_PREFIX) == true -> {
                     val answerIdx = data.removePrefix(CALLBACK_DATA_ANSWER_PREFIX).toIntOrNull()
                     if (answerIdx != null) {
