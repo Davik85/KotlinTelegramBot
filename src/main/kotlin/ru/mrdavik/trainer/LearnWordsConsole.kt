@@ -1,5 +1,7 @@
-import trainer.LearnWordsTrainer
-import trainer.DEFAULT_WORDS_FILE
+package ru.mrdavik.trainer
+
+import ru.mrdavik.trainer.trainer.LearnWordsTrainer
+import ru.mrdavik.trainer.trainer.DEFAULT_WORDS_FILE
 
 fun main() {
     LearnWordsTrainer.initializeDemoWordsIfNeeded(DEFAULT_WORDS_FILE)

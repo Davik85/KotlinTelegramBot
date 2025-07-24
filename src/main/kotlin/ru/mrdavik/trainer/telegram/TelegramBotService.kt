@@ -1,8 +1,11 @@
-package telegram
+package ru.mrdavik.trainer.telegram
 
 import kotlinx.serialization.json.Json
-import telegram.dto.*
-import model.Question
+import ru.mrdavik.trainer.model.Question
+import ru.mrdavik.trainer.telegram.dto.InlineKeyboardButton
+import ru.mrdavik.trainer.telegram.dto.ReplyMarkup
+import ru.mrdavik.trainer.telegram.dto.SendMessageRequest
+import ru.mrdavik.trainer.telegram.dto.TelegramResponse
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest

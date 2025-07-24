@@ -1,4 +1,4 @@
-package telegram.dto
+package ru.mrdavik.trainer.telegram.dto
 
 import kotlinx.serialization.Serializable
 

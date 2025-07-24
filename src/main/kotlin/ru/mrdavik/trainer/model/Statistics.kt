@@ -1,4 +1,4 @@
-package model
+package ru.mrdavik.trainer.model
 
 data class Statistics(
     val total: Int,

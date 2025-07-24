@@ -1,8 +1,8 @@
-package trainer
+package ru.mrdavik.trainer.trainer
 
-import model.Word
-import model.Question
-import model.Statistics
+import ru.mrdavik.trainer.model.Word
+import ru.mrdavik.trainer.model.Question
+import ru.mrdavik.trainer.model.Statistics
 import java.io.File
 
 const val DEFAULT_LEARNED_THRESHOLD = 3
