@@ -22,19 +22,18 @@ class TelegramBotService(private val botToken: String) {
     private val json = Json { ignoreUnknownKeys = true }
 
     fun getUpdates(offset: Long): TelegramResponse {
-        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset"
+        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset&timeout=30"
         val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
         while (true) {
             try {
                 val response = client.send(request, HttpResponse.BodyHandlers.ofString())
                 return json.decodeFromString(TelegramResponse.serializer(), response.body())
             } catch (e: Exception) {
-                println("Ошибка при получении обновлений: ${e.message}. Повтор через 2 сек...")
+                println("Ошибка при получении обновлений: ${e.message} | ${e.javaClass.simpleName} | Повтор через 2 сек...")
                 Thread.sleep(2000)
             }
         }
     }
-
 
     fun sendMessage(chatId: Long, text: String) {
         val body = SendMessageRequest(chatId = chatId, text = text)
@@ -81,8 +80,7 @@ class TelegramBotService(private val botToken: String) {
         try {
             client.send(request, HttpResponse.BodyHandlers.ofString())
         } catch (e: Exception) {
-            println("Ошибка отправки сообщения: ${e.message}")
+            println("Ошибка отправки сообщения: ${e.message} | ${e.javaClass.simpleName}")
         }
     }
-
 }
