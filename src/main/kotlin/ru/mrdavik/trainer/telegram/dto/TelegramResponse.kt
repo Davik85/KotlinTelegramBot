@@ -4,5 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TelegramResponse(
-    val result: List<Update>
+    val ok: Boolean = true,
+    val result: List<Update> = emptyList()
 )
+
