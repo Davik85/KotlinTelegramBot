@@ -1,6 +1,9 @@
+
 plugins {
     kotlin("jvm") version "2.2.0"
     kotlin("plugin.serialization") version "2.2.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    application
 }
 
 group = "org.example"
@@ -19,5 +22,9 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(23)
+    jvmToolchain(21)
+}
+
+application {
+    mainClass.set("ru.mrdavik.trainer.MainTelegramKt")
 }
