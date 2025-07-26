@@ -11,6 +11,9 @@ import ru.mrdavik.trainer.telegram.TelegramBotService
 const val COMMAND_MENU = "/menu"
 const val COMMAND_START = "/start"
 const val COMMAND_MENU_WORD = "menu"
+const val BOT_USERNAME = "@EnglishWordsDavikBot"
+val COMMAND_MENU_FULL = "$COMMAND_MENU$BOT_USERNAME"
+val COMMAND_START_FULL = "$COMMAND_START$BOT_USERNAME"
 
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
@@ -41,9 +44,13 @@ fun main(args: Array<String>) {
                     val text = update.message?.text
                     val data = update.callbackQuery?.data
 
-                    if (text?.equals(COMMAND_MENU, ignoreCase = true) == true
-                        || text?.equals(COMMAND_START, ignoreCase = true) == true
-                        || text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true) {
+                    if (
+                        text?.equals(COMMAND_MENU, ignoreCase = true) == true ||
+                        text?.equals(COMMAND_START, ignoreCase = true) == true ||
+                        text?.equals(COMMAND_MENU_WORD, ignoreCase = true) == true ||
+                        text?.equals(COMMAND_MENU_FULL, ignoreCase = true) == true ||
+                        text?.equals(COMMAND_START_FULL, ignoreCase = true) == true
+                    ) {
                         botService.sendMenu(chatId)
                         continue
                     }
