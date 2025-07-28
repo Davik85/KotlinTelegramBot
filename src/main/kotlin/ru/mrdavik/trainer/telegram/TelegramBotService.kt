@@ -16,16 +16,25 @@ const val CALLBACK_LEARN_WORDS_CLICKED = "learn_words_clicked"
 const val CALLBACK_STATISTICS_CLICKED = "statistics_clicked"
 const val CALLBACK_RESET_PROGRESS = "reset_progress"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val CALLBACK_MENU_CLICKED = "menu_clicked"
+
 
 class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
     private val json = Json { ignoreUnknownKeys = true }
 
     fun getUpdates(offset: Long): TelegramResponse {
-        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset"
+        val url = "$TELEGRAM_API_BASE_URL/bot$botToken/getUpdates?offset=$offset&timeout=30"
         val request = HttpRequest.newBuilder().uri(URI.create(url)).build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return json.decodeFromString(TelegramResponse.serializer(), response.body())
+        while (true) {
+            try {
+                val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+                return json.decodeFromString(TelegramResponse.serializer(), response.body())
+            } catch (e: Exception) {
+                println("Ошибка при получении обновлений: ${e.message} | ${e.javaClass.simpleName} | Повтор через 2 сек...")
+                Thread.sleep(2000)
+            }
+        }
     }
 
     fun sendMessage(chatId: Long, text: String) {
@@ -52,9 +61,12 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendQuestion(chatId: Long, question: Question) {
-        val keyboard = listOf(question.options.mapIndexed { idx, word ->
-            InlineKeyboardButton(word.translate, "$CALLBACK_DATA_ANSWER_PREFIX$idx")
-        })
+        val keyboard = question.options.mapIndexed { idx, word ->
+            listOf(InlineKeyboardButton(word.translate, "$CALLBACK_DATA_ANSWER_PREFIX$idx"))
+        }.toMutableList()
+
+        keyboard.add(listOf(InlineKeyboardButton("Выйти в меню", CALLBACK_MENU_CLICKED)))
+
         val body = SendMessageRequest(
             chatId = chatId,
             text = question.options[question.correctIndex].original,
@@ -63,6 +75,7 @@ class TelegramBotService(private val botToken: String) {
         sendJson(json.encodeToString(body))
     }
 
+
     private fun sendJson(jsonBody: String) {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"
         val request = HttpRequest.newBuilder()
@@ -70,6 +83,10 @@ class TelegramBotService(private val botToken: String) {
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
             .build()
-        client.send(request, HttpResponse.BodyHandlers.ofString())
+        try {
+            client.send(request, HttpResponse.BodyHandlers.ofString())
+        } catch (e: Exception) {
+            println("Ошибка отправки сообщения: ${e.message} | ${e.javaClass.simpleName}")
+        }
     }
 }
