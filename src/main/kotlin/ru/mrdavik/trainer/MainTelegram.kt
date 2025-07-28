@@ -5,7 +5,7 @@ import ru.mrdavik.trainer.telegram.CALLBACK_DATA_ANSWER_PREFIX
 import ru.mrdavik.trainer.telegram.CALLBACK_LEARN_WORDS_CLICKED
 import ru.mrdavik.trainer.telegram.CALLBACK_RESET_PROGRESS
 import ru.mrdavik.trainer.telegram.CALLBACK_STATISTICS_CLICKED
-import ru.mrdavik.trainer.telegram.CALLBACK_MENU_CLICKED // <--- ДОБАВЬ!
+import ru.mrdavik.trainer.telegram.CALLBACK_MENU_CLICKED
 import ru.mrdavik.trainer.trainer.LearnWordsTrainer
 import ru.mrdavik.trainer.telegram.TelegramBotService
 
