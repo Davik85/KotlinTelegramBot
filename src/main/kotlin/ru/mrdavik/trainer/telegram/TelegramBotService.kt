@@ -16,6 +16,8 @@ const val CALLBACK_LEARN_WORDS_CLICKED = "learn_words_clicked"
 const val CALLBACK_STATISTICS_CLICKED = "statistics_clicked"
 const val CALLBACK_RESET_PROGRESS = "reset_progress"
 const val CALLBACK_DATA_ANSWER_PREFIX = "answer_"
+const val CALLBACK_MENU_CLICKED = "menu_clicked"
+
 
 class TelegramBotService(private val botToken: String) {
     private val client = HttpClient.newBuilder().build()
@@ -59,9 +61,12 @@ class TelegramBotService(private val botToken: String) {
     }
 
     fun sendQuestion(chatId: Long, question: Question) {
-        val keyboard = listOf(question.options.mapIndexed { idx, word ->
-            InlineKeyboardButton(word.translate, "$CALLBACK_DATA_ANSWER_PREFIX$idx")
-        })
+        val keyboard = question.options.mapIndexed { idx, word ->
+            listOf(InlineKeyboardButton(word.translate, "$CALLBACK_DATA_ANSWER_PREFIX$idx"))
+        }.toMutableList()
+
+        keyboard.add(listOf(InlineKeyboardButton("Выйти в меню", CALLBACK_MENU_CLICKED)))
+
         val body = SendMessageRequest(
             chatId = chatId,
             text = question.options[question.correctIndex].original,
@@ -69,6 +74,7 @@ class TelegramBotService(private val botToken: String) {
         )
         sendJson(json.encodeToString(body))
     }
+
 
     private fun sendJson(jsonBody: String) {
         val url = "$TELEGRAM_API_BASE_URL/bot$botToken/sendMessage"

@@ -5,6 +5,7 @@ import ru.mrdavik.trainer.telegram.CALLBACK_DATA_ANSWER_PREFIX
 import ru.mrdavik.trainer.telegram.CALLBACK_LEARN_WORDS_CLICKED
 import ru.mrdavik.trainer.telegram.CALLBACK_RESET_PROGRESS
 import ru.mrdavik.trainer.telegram.CALLBACK_STATISTICS_CLICKED
+import ru.mrdavik.trainer.telegram.CALLBACK_MENU_CLICKED // <--- ДОБАВЬ!
 import ru.mrdavik.trainer.trainer.LearnWordsTrainer
 import ru.mrdavik.trainer.telegram.TelegramBotService
 
@@ -30,9 +31,13 @@ fun main(args: Array<String>) {
         try {
             Thread.sleep(2000)
             val response: TelegramResponse = botService.getUpdates(lastUpdateId)
+            var maxUpdateId = lastUpdateId
+
             for (update in response.result) {
                 try {
-                    lastUpdateId = maxOf(lastUpdateId, update.updateId + 1)
+                    if (update.updateId > maxUpdateId) {
+                        maxUpdateId = update.updateId
+                    }
                     val chatId: Long = update.message?.chat?.id
                         ?: update.callbackQuery?.message?.chat?.id
                         ?: continue
@@ -68,6 +73,9 @@ fun main(args: Array<String>) {
                                 botService.sendQuestion(chatId, question)
                             }
                         }
+                        data == CALLBACK_MENU_CLICKED -> {
+                            botService.sendMenu(chatId)
+                        }
                         data == CALLBACK_RESET_PROGRESS -> {
                             trainer.resetProgress()
                             botService.sendMessage(chatId, "Ваш прогресс сброшен! Начните изучение заново.")
@@ -102,6 +110,9 @@ fun main(args: Array<String>) {
                     println("ОШИБКА при обработке update: ${e.message}")
                     e.printStackTrace()
                 }
+            }
+            if (response.result.isNotEmpty()) {
+                lastUpdateId = maxUpdateId + 1
             }
         } catch (e: Exception) {
             println("ГЛОБАЛЬНАЯ ОШИБКА основного цикла: ${e.message}")
