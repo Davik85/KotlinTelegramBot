@@ -1,0 +1,237 @@
+computer|компьютер|0
+laptop|ноутбук|0
+desktop|настольный компьютер|0
+monitor|монитор|0
+keyboard|клавиатура|0
+mouse|мышь|0
+touchpad|тачпад|0
+screen|экран|0
+display|дисплей|0
+resolution|разрешение|0
+processor|процессор|0
+CPU|центральный процессор|0
+core|ядро|0
+RAM|оперативная память|0
+memory|память|0
+storage|хранилище|0
+hard drive|жесткий диск|0
+SSD|твердотельный накопитель|0
+USB|юэсби|0
+port|порт|0
+cable|кабель|0
+adapter|адаптер|0
+charger|зарядное устройство|0
+battery|батарея|0
+power|питание|0
+plug|вилка|0
+socket|розетка|0
+wireless|беспроводной|0
+Bluetooth|блютуз|0
+Wi-Fi|вайфай|0
+network|сеть|0
+router|роутер|0
+modem|модем|0
+connection|соединение|0
+download|скачать|0
+upload|загрузить|0
+speed|скорость|0
+bandwidth|пропускная способность|0
+signal|сигнал|0
+internet|интернет|0
+browser|браузер|0
+website|веб-сайт|0
+webpage|веб-страница|0
+URL|ссылка|0
+link|ссылка|0
+button|кнопка|0
+menu|меню|0
+window|окно|0
+tab|вкладка|0
+folder|папка|0
+file|файл|0
+document|документ|0
+image|изображение|0
+photo|фотография|0
+video|видео|0
+audio|аудио|0
+music|музыка|0
+format|формат|0
+extension|расширение|0
+archive|архив|0
+zip|зип|0
+rar|рар|0
+pdf|пдф|0
+doc|док|0
+txt|текст|0
+csv|цсв|0
+code|код|0
+program|программа|0
+software|программное обеспечение|0
+application|приложение|0
+app|приложение|0
+platform|платформа|0
+system|система|0
+OS|операционная система|0
+Windows|виндовс|0
+Mac|мак|0
+Linux|линукс|0
+server|сервер|0
+client|клиент|0
+user|пользователь|0
+account|аккаунт|0
+login|логин|0
+password|пароль|0
+access|доступ|0
+permission|разрешение|0
+security|безопасность|0
+antivirus|антивирус|0
+malware|вредоносное ПО|0
+virus|вирус|0
+firewall|фаервол|0
+backup|резервная копия|0
+restore|восстановить|0
+update|обновление|0
+upgrade|улучшение|0
+install|установить|0
+uninstall|удалить|0
+settings|настройки|0
+preferences|предпочтения|0
+configuration|конфигурация|0
+setup|установка|0
+support|поддержка|0
+help|помощь|0
+error|ошибка|0
+bug|баг|0
+issue|проблема|0
+fix|исправить|0
+patch|патч|0
+log|журнал|0
+report|отчет|0
+message|сообщение|0
+notification|уведомление|0
+alert|оповещение|0
+network|сеть|0
+protocol|протокол|0
+HTTP|эйчти-ти-пи|0
+HTTPS|эйчти-ти-пи-эс|0
+FTP|эф-ти-пи|0
+SSH|эс-эс-эйч|0
+IP address|айпи-адрес|0
+MAC address|мак-адрес|0
+domain|домен|0
+host|хост|0
+hostname|имя хоста|0
+cloud|облако|0
+database|база данных|0
+table|таблица|0
+row|строка|0
+column|столбец|0
+query|запрос|0
+index|индекс|0
+primary key|первичный ключ|0
+foreign key|внешний ключ|0
+sql|эскуэль|0
+json|джейсон|0
+xml|иксмэл|0
+yaml|ямл|0
+html|эйчтиэмэл|0
+css|си-эс-эс|0
+javascript|джаваскрипт|0
+python|пайтон|0
+java|джава|0
+kotlin|кotlin|0
+c++|си плюс плюс|0
+c#|си шарп|0
+php|пэ-ха-пэ|0
+framework|фреймворк|0
+library|библиотека|0
+module|модуль|0
+package|пакет|0
+dependency|зависимость|0
+version|версия|0
+release|релиз|0
+build|сборка|0
+deploy|развертывание|0
+test|тест|0
+unit test|модульный тест|0
+integration|интеграция|0
+api|апи|0
+sdk|эсдикей|0
+cli|си-эль-ай|0
+gui|гуи|0
+ui|юай|0
+ux|юикс|0
+design|дизайн|0
+layout|макет|0
+font|шрифт|0
+color|цвет|0
+icon|иконка|0
+image|картинка|0
+drag|перетащить|0
+drop|отпустить|0
+clipboard|буфер обмена|0
+cut|вырезать|0
+copy|копировать|0
+paste|вставить|0
+select|выбрать|0
+search|поиск|0
+find|найти|0
+replace|заменить|0
+open|открыть|0
+close|закрыть|0
+save|сохранить|0
+print|печатать|0
+download|скачать|0
+upload|загрузить|0
+share|поделиться|0
+attach|прикрепить|0
+remove|удалить|0
+delete|стереть|0
+undo|отменить|0
+redo|повторить|0
+start|запустить|0
+stop|остановить|0
+pause|пауза|0
+resume|возобновить|0
+run|выполнить|0
+execute|исполнить|0
+queue|очередь|0
+thread|поток|0
+process|процесс|0
+task|задача|0
+event|событие|0
+function|функция|0
+variable|переменная|0
+constant|константа|0
+class|класс|0
+object|объект|0
+instance|экземпляр|0
+constructor|конструктор|0
+method|метод|0
+argument|аргумент|0
+parameter|параметр|0
+return|вернуть|0
+exception|исключение|0
+try|попробовать|0
+catch|поймать|0
+finally|в конце концов|0
+throw|выбросить|0
+break|прервать|0
+continue|продолжить|0
+loop|цикл|0
+recursion|рекурсия|0
+array|массив|0
+list|список|0
+dictionary|словарь|0
+set|множество|0
+map|отображение|0
+stack|стек|0
+queue|очередь|0
+tree|дерево|0
+graph|граф|0
+binary|двоичный|0
+hex|шестнадцатеричный|0
+octal|восьмеричный|0
+decimal|десятичный|0
+algorithm|алгоритм|0
+logic|логика|0

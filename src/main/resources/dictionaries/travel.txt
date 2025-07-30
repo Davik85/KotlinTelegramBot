@@ -1,0 +1,210 @@
+airport|аэропорт|0
+passport|паспорт|0
+ticket|билет|0
+flight|рейс|0
+departure|отправление|0
+arrival|прибытие|0
+check-in|регистрация|0
+boarding|посадка|0
+gate|выход на посадку|0
+luggage|багаж|0
+suitcase|чемодан|0
+backpack|рюкзак|0
+carry-on|ручная кладь|0
+customs|таможня|0
+security|безопасность|0
+baggage claim|выдача багажа|0
+visa|виза|0
+reservation|бронь|0
+hotel|отель|0
+hostel|хостел|0
+guesthouse|гостевой дом|0
+room|комната|0
+single room|одноместный номер|0
+double room|двухместный номер|0
+reception|ресепшн|0
+key|ключ|0
+elevator|лифт|0
+stairs|лестница|0
+floor|этаж|0
+bed|кровать|0
+blanket|одеяло|0
+pillow|подушка|0
+bathroom|ванная|0
+shower|душ|0
+toilet|туалет|0
+towel|полотенце|0
+soap|мыло|0
+shampoo|шампунь|0
+breakfast|завтрак|0
+lunch|обед|0
+dinner|ужин|0
+restaurant|ресторан|0
+cafe|кафе|0
+menu|меню|0
+bill|счет|0
+tip|чаевые|0
+waiter|официант|0
+waitress|официантка|0
+table|стол|0
+chair|стул|0
+glass|стакан|0
+bottle|бутылка|0
+water|вода|0
+juice|сок|0
+coffee|кофе|0
+tea|чай|0
+bread|хлеб|0
+butter|масло|0
+cheese|сыр|0
+meat|мясо|0
+fish|рыба|0
+chicken|курица|0
+egg|яйцо|0
+fruit|фрукты|0
+vegetable|овощ|0
+salt|соль|0
+pepper|перец|0
+sugar|сахар|0
+fork|вилка|0
+knife|нож|0
+spoon|ложка|0
+plate|тарелка|0
+napkin|салфетка|0
+order|заказ|0
+delicious|вкусно|0
+hungry|голодный|0
+thirsty|хочу пить|0
+train|поезд|0
+station|вокзал|0
+platform|платформа|0
+bus|автобус|0
+stop|остановка|0
+subway|метро|0
+ticket office|касса|0
+route|маршрут|0
+map|карта|0
+direction|направление|0
+left|налево|0
+right|направо|0
+straight|прямо|0
+near|рядом|0
+far|далеко|0
+crossroad|перекресток|0
+traffic light|светофор|0
+taxi|такси|0
+driver|водитель|0
+car|машина|0
+parking|парковка|0
+rent|арендовать|0
+petrol|бензин|0
+license|водительские права|0
+accident|авария|0
+insurance|страховка|0
+emergency|чрезвычайная ситуация|0
+help|помощь|0
+doctor|врач|0
+hospital|больница|0
+pharmacy|аптека|0
+medicine|лекарство|0
+police|полиция|0
+lost|потерян|0
+found|найден|0
+address|адрес|0
+street|улица|0
+square|площадь|0
+center|центр|0
+market|рынок|0
+shop|магазин|0
+store|магазин|0
+mall|торговый центр|0
+open|открыто|0
+closed|закрыто|0
+price|цена|0
+discount|скидка|0
+buy|покупать|0
+sell|продавать|0
+cash|наличные|0
+credit card|кредитная карта|0
+change|сдача|0
+receipt|чек|0
+souvenir|сувенир|0
+gift|подарок|0
+post office|почта|0
+letter|письмо|0
+stamp|марка|0
+phone|телефон|0
+call|звонить|0
+internet|интернет|0
+wifi|вайфай|0
+password|пароль|0
+photo|фото|0
+camera|камера|0
+ticket|билет|0
+entrance|вход|0
+exit|выход|0
+open hours|часы работы|0
+museum|музей|0
+gallery|галерея|0
+theater|театр|0
+cinema|кинотеатр|0
+park|парк|0
+zoo|зоопарк|0
+beach|пляж|0
+sea|море|0
+lake|озеро|0
+mountain|гора|0
+river|река|0
+bridge|мост|0
+boat|лодка|0
+swimming pool|бассейн|0
+sun|солнце|0
+weather|погода|0
+hot|жарко|0
+cold|холодно|0
+rain|дождь|0
+snow|снег|0
+wind|ветер|0
+cloud|облако|0
+storm|шторм|0
+umbrella|зонт|0
+sunscreen|крем от солнца|0
+shoes|обувь|0
+clothes|одежда|0
+bag|сумка|0
+ticket machine|автомат билетов|0
+boarding pass|посадочный талон|0
+delay|задержка|0
+cancelled|отменено|0
+next|следующий|0
+previous|предыдущий|0
+reservation|бронь|0
+confirm|подтвердить|0
+information|информация|0
+tour|экскурсия|0
+guide|гид|0
+group|группа|0
+tourist|турист|0
+traveller|путешественник|0
+visit|посетить|0
+plan|план|0
+schedule|расписание|0
+holiday|каникулы|0
+vacation|отпуск|0
+local|местный|0
+foreigner|иностранец|0
+passport control|паспортный контроль|0
+customs declaration|таможенная декларация|0
+queue|очередь|0
+wait|ждать|0
+danger|опасность|0
+safe|безопасно|0
+busy|занято|0
+free|свободно|0
+comfortable|удобно|0
+uncomfortable|неудобно|0
+welcome|добро пожаловать|0
+thank you|спасибо|0
+please|пожалуйста|0
+excuse me|извините|0
+sorry|простите|0
