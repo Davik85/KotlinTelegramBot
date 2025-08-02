@@ -14,7 +14,7 @@ class LearnWordsTrainer(
     private val answerOptionsCount: Int = DEFAULT_ANSWER_OPTIONS_COUNT,
     private val fileName: String = DEFAULT_WORDS_FILE
 ) {
-    private val dictionary: List<Word>
+    private var dictionary: List<Word>
     private var currentQuestion: Question? = null
 
     init {
@@ -71,8 +71,23 @@ class LearnWordsTrainer(
         currentQuestion = null
     }
 
-    private fun loadDictionary(): List<Word> {
-        val file = File(fileName)
+    fun reloadDictionary(fileName: String = this.fileName) {
+        val newWords = loadDictionary(fileName)
+        if (newWords.isNotEmpty()) {
+            val oldMap = dictionary.associateBy { it.original to it.translate }
+            newWords.forEach { word ->
+                oldMap[word.original to word.translate]?.let {
+                    word.correctAnswersCount = it.correctAnswersCount
+                }
+            }
+            dictionary = newWords
+            saveDictionary()
+            currentQuestion = null
+        }
+    }
+
+    private fun loadDictionary(name: String = fileName): List<Word> {
+        val file = File(name)
         if (!file.exists()) return emptyList()
         return file.readLines().mapNotNull { line ->
             val parts = line.split("|")

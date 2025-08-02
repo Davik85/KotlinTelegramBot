@@ -16,6 +16,8 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation("com.github.albfernandez:juniversalchardet:2.4.0")
+
 }
 
 tasks.test {
